@@ -1,5 +1,6 @@
 # Unpack
-This Chrome extension has been developed with the goal of automating the conversion of message pack encoded messages.
+This Chrome extension helps you to decode a Base64 + MessagePack text. It was created by me in order to streamline the end-to-end testing
+process of RabbitMQ messages, which were encoded in MessagePack.
 
 # Installation
 Currently this extension is not published on the Chrome Web Store, thus you will need to manually install it via the following steps:
