@@ -352,28 +352,55 @@ function parseBase64(input) {
   } catch (e) {
     console.log("Error parsing input: " + e.message);
     console.log(e.stack);
+    chrome.notifications.create('', {
+      title: 'Decoding status',
+      message: `An error occurred while decoding the text ${e.message}`,
+      iconUrl: '/img/copy.png',
+      type: 'basic'
+    });
     return "";
   }
 }
 
-// Extension code.
+// Chrome specific code.
+
+chrome.contextMenus.create({
+  id: "copyDecodedText",
+  title: "Copy decoded text",
+  contexts: ["all"]
+});
+
+chrome.contextMenus.onClicked.addListener(function (info, tab) {
+  if (tab) {
+    if (info.menuItemId === "copyDecodedText") {
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { type: "getSelectedText" });
+      });
+    }
+  }
+});
 
 chrome.runtime.onMessage.addListener(function (request) {
   var type = request.type;
   var text = request.text;
 
+  console.log("Received text " + text);
+
   switch (type) {
     case "handleSelection":
-      decodeText(text);
-      break;
-    case "saveToClipboard":
-      copyText(text);
+      copyText(decodeText(text));
+      chrome.notifications.create('', {
+        title: 'Decoding status',
+        message: 'The decoded text has been copied to your clipboard!',
+        iconUrl: '/img/copy.png',
+        type: 'basic'
+      });
       break;
   }
 });
 
 function decodeText(text) {
-  showOptionBox(parseBase64(text));
+  return parseBase64(text);
 }
 
 function copyText(text) {
@@ -387,12 +414,4 @@ function copyText(text) {
   document.execCommand('Copy');
 
   input.remove();
-}
-
-function showOptionBox(text) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, { type: "showOptionBox", text: text }, function (response) {
-      // Do something here?
-    });
-  });
 }

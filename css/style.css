@@ -2,3 +2,13 @@ body {
   width: 300px;
   padding: 16px;
 }
+
+.example {
+  width: 250px;
+  height: auto;
+  object-fit: contain;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 20px;
+  border-color: #6B83B9;
+}
